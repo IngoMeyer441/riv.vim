@@ -156,29 +156,33 @@ fun! s:convert(options) "{{{
     let output = get(a:options, 'output', '')
     let real_file = get(a:options, 'real_file', input)
     let style = ''
-    let args = s:rst_args(ft) 
     
-    " For PDF file , we should try rst2latex and rst2xetex.
+    " For PDF file , we should try rst2latex.
     if ft=='pdf'
         let ft='latex'
         let out_path = fnamemodify(output, ':p:h')
-        let file =  fnamemodify(output, ':p:t:r').'.xetex'
+        let file =  fnamemodify(output, ':p:t:r').'.tex'
         let o_file = output
         let output = out_path.'/'.file
         let o_ft = 'pdf'
     endif
 
+    let args = s:rst_args(ft)
 
-    let exe = 'rst2'.ft.'2.py'
-    if !executable(exe)
-        let exe = 'rst2'.ft.'.py'
+    if exists('g:riv_rst2'.ft.'_executable')
+        let exe = get(g:, 'riv_rst2'.ft.'_executable')
+    else
+        let exe = 'rst2'.ft.'2.py'
         if !executable(exe)
-            " try whitout .py extension. Compatibility with some
-            " python-docutils packages (Ubuntu 12.04 at least)
-            let exe = 'rst2'.ft.''
+            let exe = 'rst2'.ft.'.py'
             if !executable(exe)
-                call riv#error('Could not find '.exe)
-                return -1
+                " try whitout .py extension. Compatibility with some
+                " python-docutils packages (Ubuntu 12.04 at least)
+                let exe = 'rst2'.ft.''
+                if !executable(exe)
+                    call riv#error('Could not find '.exe)
+                    return -1
+                endif
             endif
         endif
     endif
@@ -214,7 +218,9 @@ fun! s:convert(options) "{{{
                 \." ".shellescape(output) )
     if o_ft=='pdf'
         " See :Man pdflatex for option details
-        if executable('pdflatex')
+        if executable('latexmk')
+            call s:sys( 'latexmk -pdf -f -silent -interaction=nonstopmode -output-directory='.out_path.' '.shellescape(output) )
+        elseif executable('pdflatex')
             call s:sys( 'pdflatex -interaction batchmode -output-directory '.out_path.' '.shellescape(output) )
             " call s:sys( 'xelatex '.shellescape(output) )
         else
