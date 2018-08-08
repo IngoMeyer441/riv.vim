@@ -11,6 +11,8 @@ set cpo&vim
 
 call riv#load_opt()
 
+syn spell toplevel
+
 syn match   rstTodo         '\v(<|:)%(FIXME|TODO|XXX|NOTE)%(:|\_s@=)' contained
 
 syn case ignore
