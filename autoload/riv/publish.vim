@@ -219,9 +219,9 @@ fun! s:convert(options) "{{{
     if o_ft=='pdf'
         " See :Man pdflatex for option details
         if executable('latexmk')
-            call s:sys( 'latexmk -xelatex -f -silent -interaction=nonstopmode -output-directory='.out_path.' '.shellescape(output) )
+            call s:sys( 'latexmk -xelatex -shell-escape -f -silent -interaction=nonstopmode -output-directory='.out_path.' '.shellescape(output) )
         elseif executable('pdflatex')
-            call s:sys( 'pdflatex -interaction batchmode -output-directory '.out_path.' '.shellescape(output) )
+            call s:sys( 'pdflatex -shell-escape -interaction batchmode -output-directory '.out_path.' '.shellescape(output) )
             " call s:sys( 'xelatex '.shellescape(output) )
         else
             call riv#error('Could not find pdflatex. Please Install texlive package.')
