@@ -46,14 +46,14 @@ fun! riv#publish#path(str) "{{{
     " :doc:`xxx.vim` => _buld/xxx.vim
     " :doc:`/xxx` => _build/DOC_ROOT/xxx.html
     "
-   
+
     let [f, t] = riv#ptn#get_file(a:str)
 
     if riv#path#is_relative(f)
         let file = f
     else
-        " if it have '/' at start. 
-        " it is the doc root for sphinx and moinmoin 
+        " if it have '/' at start.
+        " it is the doc root for sphinx and moinmoin
         if f =~ '^/'
             let file = riv#path#build_ft('html') . f[1:]
         else
@@ -96,11 +96,11 @@ fun! s:repl_file_link(line) "{{{
     " :doc:`index.rst`  => `index <index.html>`_
     " :doc:`index.vim`  => `index.vim <index.vim>`_
     " :doc:`/xxx/a.rst` => `/xxx/a.rst <DOC_ROOT>/xxx/a.rst`_
-    " >>> echom s:repl_file_link(":doc:`/xxx/a.rst`") 
+    " >>> echom s:repl_file_link(":doc:`/xxx/a.rst`")
     " /xxx/a.rst <DOC_ROOT>/xxx/a.rst`_
 
     let line = a:line
-    
+
     " we will get the idx and find the pattern from origin_file line.
     let o_line = line
     let pre_idx = 0           " for the inline markup column check
@@ -125,7 +125,7 @@ fun! s:repl_file_link(line) "{{{
     return line
 endfun "}}}
 fun! s:sub_ext2html(line) "{{{
-    " sub the .. xxx.rst: xxx.rst 
+    " sub the .. xxx.rst: xxx.rst
     " to      .. xxx.rst: xxx.html
     let line = a:line
     let str = matchstr(line, s:p.loc_normal)
@@ -149,14 +149,14 @@ fun! s:convert(options) "{{{
     "   output: 'html/xxx.html',
     "   real_file: 'rst/xxx.rst' or input,
     " }
-    
+
     let ft = get(a:options, 'filetype', 'html')
     let o_ft = ''
     let input = get(a:options, 'input', '')
     let output = get(a:options, 'output', '')
     let real_file = get(a:options, 'real_file', input)
     let style = ''
-    
+
     " For PDF file , we should try rst2latex.
     if ft=='pdf'
         let ft='latex'
@@ -186,11 +186,11 @@ fun! s:convert(options) "{{{
             endif
         endif
     endif
-    
+
 
     " try 2 first , for py3 version should decode to 'bytes'.
-    if ft == 'html' 
-        if index(s:themes, g:riv_html_code_hl_style)            
+    if ft == 'html'
+        if index(s:themes, g:riv_html_code_hl_style)
             let st = g:riv_html_code_hl_style
             let style = ' --stylesheet='
                         \.s:css_html.','
@@ -214,12 +214,12 @@ fun! s:convert(options) "{{{
     let syn = '--syntax-highlight=short'
 
     call s:sys( exe." ". style ." " . syn . "  " . args . " "
-                \.shellescape(input) 
+                \.shellescape(input)
                 \." ".shellescape(output) )
     if o_ft=='pdf'
         " See :Man pdflatex for option details
         if executable('latexmk')
-            call s:sys( 'latexmk -pdf -f -silent -interaction=nonstopmode -output-directory='.out_path.' '.shellescape(output) )
+            call s:sys( 'latexmk -xelatex -f -silent -interaction=nonstopmode -output-directory='.out_path.' '.shellescape(output) )
         elseif executable('pdflatex')
             call s:sys( 'pdflatex -interaction batchmode -output-directory '.out_path.' '.shellescape(output) )
             " call s:sys( 'xelatex '.shellescape(output) )
@@ -241,8 +241,8 @@ fun! s:copy_img(input, output) "{{{
     for line in file
         let img = matchstr(line, '^.. \(figure\|image\):: \s*\zs.*\ze\s*$')
         if img != '' && riv#path#is_relative(img)
-            let origin_file = riv#path#join(origin_path, img) 
-            let new_file = riv#path#join(out_path, img) 
+            let origin_file = riv#path#join(origin_path, img)
+            let new_file = riv#path#join(out_path, img)
 
             if filereadable(origin_file)
                 let new_path = fnamemodify(new_file, ":p:h")
@@ -263,7 +263,7 @@ fun! s:copy_img(input, output) "{{{
             else
                 let cmd = 'cp -rf '.origin_file.' '.new_file
             endif
-            call s:sys(cmd) 
+            call s:sys(cmd)
         endif
     endfor
 endfun "}}}
@@ -280,7 +280,7 @@ fun! s:single2(ft, file, browse) "{{{
         let temp_path = s:tempdir
         let out_file = temp_path . riv#path#ext_tail(file, a:ft)
     else
-        let temp_path = riv#path#directory(g:riv_temp_path)  
+        let temp_path = riv#path#directory(g:riv_temp_path)
         let out_file = temp_path . riv#path#ext_tail(file, a:ft)
     endif
 
@@ -353,11 +353,11 @@ fun! riv#publish#2(ft, file, path, browse) "{{{
     for line in lines
         " Copy all exists file under directory.
         let file = matchstr(line, '^\s*\.\. image::\s\zs.*')
-        if file == ''  
+        if file == ''
             let file = matchstr(line, s:p.loc_normal)
         endif
         if file == '' | continue | endif
-        " Here we have not check file outside or inside 
+        " Here we have not check file outside or inside
         " folder.
         if filereadable(file)
             call s:sys( 'cp -f '. file. ' '.  fnamemodify(out_path, ':h'))
@@ -403,12 +403,12 @@ fun! riv#publish#proj2(ft) abort "{{{
         call riv#publish#2(a:ft,files[i], ft_path, 0)
         redraw
         echohl Function
-        echo i.'/'.len(files) 
+        echo i.'/'.len(files)
         echohl Normal
         echon files[i]
     endfor
     let copy_ext = '{'.join(g:_riv_t.file_ext_lst,',').'}'
-    if a:ft == "html" 
+    if a:ft == "html"
         \ && input("Copy all file of extension: ".copy_ext."\n(Y/n):")!~?'n'
         let files = filter(split(glob(riv#path#root().'**/*'.copy_ext)), 'v:val !~ '''.riv#path#p_build().'''')
         for file in files
@@ -418,12 +418,12 @@ fun! riv#publish#proj2(ft) abort "{{{
 endfun "}}}
 
 fun! s:rst_args(ft) "{{{
-    return exists("g:riv_rst2".a:ft."_args") ? 
+    return exists("g:riv_rst2".a:ft."_args") ?
                 \ !empty(g:riv_rst2{a:ft}_args)
                 \ ? g:riv_rst2{a:ft}_args : '' : ''
 endfun "}}}
 fun! riv#publish#auto_mkdir(path) "{{{
-    if !isdirectory(fnamemodify(a:path,':h')) 
+    if !isdirectory(fnamemodify(a:path,':h'))
         call mkdir(fnamemodify(a:path,':h'),'p')
     endif
 endfun "}}}
