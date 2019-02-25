@@ -1,6 +1,6 @@
-#######################
-Riv: Take Notes in rst
-#######################
+###########################
+Riv: Notes and wiki in rst
+###########################
 
 :Last Update: 2018-01-21
 :Version: 0.793
@@ -9,6 +9,7 @@ New Changes
 ===========
 
 0.793: fix the RivInstruction, add RivDoc
+
 0.792: fix the python/rst syntax file
 
 0.791: Add a conceal syntax for \*.rst filelink
