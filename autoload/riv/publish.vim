@@ -157,7 +157,7 @@ fun! s:convert(options) "{{{
     let real_file = get(a:options, 'real_file', input)
     let style = ''
 
-    " For PDF file , we should try rst2latex.
+    " For PDF file , we should try rst2latex and rst2xetex.
     if ft=='pdf'
         let ft='latex'
         let out_path = fnamemodify(output, ':p:h')
@@ -418,9 +418,14 @@ fun! riv#publish#proj2(ft) abort "{{{
 endfun "}}}
 
 fun! s:rst_args(ft) "{{{
-    return exists("g:riv_rst2".a:ft."_args") ?
-                \ !empty(g:riv_rst2{a:ft}_args)
-                \ ? g:riv_rst2{a:ft}_args : '' : ''
+    let l:var_args = 'rst2'.a:ft.'_args'
+    let l:args = ''
+    if exists("g:_riv_c.main_idx")
+        let l:args = get(g:_riv_c.p[g:_riv_c.main_idx], l:var_args, '')
+    else
+        args = get(g, 'riv_'.l:var_args, '')
+    endif
+    return l:args
 endfun "}}}
 fun! riv#publish#auto_mkdir(path) "{{{
     if !isdirectory(fnamemodify(a:path,':h'))
